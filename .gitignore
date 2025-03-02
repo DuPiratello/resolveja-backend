@@ -1,0 +1,15 @@
+# Ambiente virtual do Python (evita subir a pasta "venv")
+venv/
+*.pyc
+__pycache__/
+
+# Configuração do banco de dados local
+instance/
+.env
+*.sqlite
+
+# Logs e arquivos temporários
+*.log
+
+# Arquivos de migração antigos (se quiser evitar)
+migrations/
