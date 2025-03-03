@@ -21,10 +21,12 @@ def create_app():
     CORS(app)
     socketio.init_app(app)
 
-    from app.routes import main
+    # ⚠️ Importações de rotas depois da inicialização do db
+    from app.routes import main, admin_routes
     from app.auth import auth
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(admin_routes, url_prefix='/admin')  # Rotas admin
 
     return app

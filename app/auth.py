@@ -13,12 +13,17 @@ def register():
     if User.query.filter_by(email=data['email']).first():
         return jsonify({"error": "Email já cadastrado"}), 409
 
-    new_user = User(username=data['username'], email=data['email'])
+    # Se não for passado role, define "user" por padrão
+    role = data.get('role', 'user')
+    if role not in ["user", "admin"]:
+        return jsonify({"error": "Role inválida"}), 400
+
+    new_user = User(username=data['username'], email=data['email'], role=role)
     new_user.set_password(data['password'])
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "Usuário registrado com sucesso!"}), 201
+    return jsonify({"message": "Usuário registrado com sucesso!", "role": new_user.role}), 201
 
 @auth.route('/login', methods=['POST'])
 def login():
