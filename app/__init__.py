@@ -24,9 +24,11 @@ def create_app():
     # ⚠️ Importações de rotas depois da inicialização do db
     from app.routes import main, admin_routes
     from app.auth import auth
+    from app.routes import denuncia_routes  # 📌 Importa as rotas de denúncias
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(admin_routes, url_prefix='/admin')  # Rotas admin
+    app.register_blueprint(denuncia_routes, url_prefix='/api')  # 📌 Adiciona as rotas de denúncias
 
     return app

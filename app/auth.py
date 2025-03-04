@@ -1,29 +1,44 @@
 from flask import Blueprint, request, jsonify   #type:ignore
 from app.models import db, User
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity  #type:ignore
+from werkzeug.security import generate_password_hash #type:ignore
 
 auth = Blueprint('auth', __name__)
 
 @auth.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    if not data or not data.get('username') or not data.get('email') or not data.get('password'):
-        return jsonify({"error": "Dados incompletos"}), 400
+    try:
+        data = request.get_json()
+        print("📌 Dados Recebidos:", data)
 
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({"error": "Email já cadastrado"}), 409
+        if not data or not data.get('username') or not data.get('email') or not data.get('password'):
+            print("❌ Dados incompletos")
+            return jsonify({"error": "Dados incompletos"}), 400
 
-    # Se não for passado role, define "user" por padrão
-    role = data.get('role', 'user')
-    if role not in ["user", "admin"]:
-        return jsonify({"error": "Role inválida"}), 400
+        # 🔍 Verificar se o e-mail ou username já estão cadastrados
+        existing_user = User.query.filter(
+            (User.email == data['email']) | (User.username == data['username'])
+        ).first()
 
-    new_user = User(username=data['username'], email=data['email'], role=role)
-    new_user.set_password(data['password'])
-    db.session.add(new_user)
-    db.session.commit()
+        if existing_user:
+            print(f"❌ Usuário já cadastrado! username: {existing_user.username}, email: {existing_user.email}")
+            return jsonify({"error": "Usuário ou e-mail já cadastrado!"}), 409  # 🔥 409 = Conflict
 
-    return jsonify({"message": "Usuário registrado com sucesso!", "role": new_user.role}), 201
+        # 🔒 Hash da senha antes de salvar
+        hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+
+        # ✅ Criar novo usuário
+        new_user = User(username=data['username'], email=data['email'], password_hash=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        print("✅ Usuário registrado com sucesso!")
+        return jsonify({"message": "Usuário registrado com sucesso!"}), 201
+
+    except Exception as e:
+        print("❌ ERRO AO REGISTRAR:", str(e))
+        return jsonify({"error": "Erro interno no servidor"}), 500
+
 
 @auth.route('/login', methods=['POST'])
 def login():

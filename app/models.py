@@ -13,3 +13,9 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class Denuncia(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(255), nullable=False)
+    tipo = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="Pendente")
