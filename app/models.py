@@ -1,4 +1,4 @@
-from werkzeug.security import generate_password_hash, check_password_hash #type:ignore
+from werkzeug.security import generate_password_hash, check_password_hash  # type:ignore
 from app import db
 
 class User(db.Model):
@@ -19,3 +19,4 @@ class Denuncia(db.Model):
     titulo = db.Column(db.String(255), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(20), nullable=False, default="Pendente")
+    descricao = db.Column(db.Text, nullable=True)  # Campo opcional
