@@ -6,7 +6,11 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default="user")  # Novo campo de role
+    phone = db.Column(db.String(20), nullable=False)
+    cpf = db.Column(db.String(14), unique=True, nullable=False)
+    role = db.Column(db.String(20), nullable=False, default="user")
+    
+    denuncias = db.relationship('Denuncia', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -20,3 +24,10 @@ class Denuncia(db.Model):
     tipo = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(20), nullable=False, default="Pendente")
     descricao = db.Column(db.Text, nullable=True)  # Campo opcional
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    def __init__(self, **kwargs):
+        if not kwargs.get('user_id'):
+            raise ValueError("Denúncia deve ter um user_id válido")
+        super().__init__(**kwargs)

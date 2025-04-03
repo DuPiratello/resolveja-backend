@@ -1,0 +1,23 @@
+GITHUB
+git add .
+git commit -m "mensagem"
+git push origin main
+
+DO OUTRO LADO
+git pull origin main
+*se tiver alterações locais*
+	git reset --hard
+	git pull origin main
+"git stash - para salvar temporariamente as mudanças locais"
+"git stash pop - para reaplicar as mudanças que estavam guardadas no git stash executado anteriormente"
+
+
+1.0.0
+Core alterado/Requisito(Alteração de algum RNF)/Correção(Algo insignificante)
+
+POSTGRE:
+C:\Program Files\PostgreSQL\17\bin> psql -U resolveja_user -d resolveja
+
+venv\Scripts\activate
+
+123456

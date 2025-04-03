@@ -11,24 +11,36 @@ def register():
         data = request.get_json()
         print("📌 Dados Recebidos:", data)
 
-        if not data or not data.get('username') or not data.get('email') or not data.get('password'):
+        # ✅ Agora verifica todos os campos obrigatórios
+        required_fields = ['username', 'email', 'password', 'phone', 'cpf']
+        if not data or any(field not in data for field in required_fields):
             print("❌ Dados incompletos")
-            return jsonify({"error": "Dados incompletos"}), 400
+            return jsonify({"error": "Todos os campos são obrigatórios"}), 400
 
-        # 🔍 Verificar se o e-mail ou username já estão cadastrados
+        # 🔍 Verificar se email, username ou CPF já existem
         existing_user = User.query.filter(
-            (User.email == data['email']) | (User.username == data['username'])
+            (User.email == data['email']) | 
+            (User.username == data['username']) |
+            (User.cpf == data['cpf'])  # 👈 Novo check para CPF único
         ).first()
 
         if existing_user:
-            print(f"❌ Usuário já cadastrado! username: {existing_user.username}, email: {existing_user.email}")
-            return jsonify({"error": "Usuário ou e-mail já cadastrado!"}), 409  # 🔥 409 = Conflict
+            conflict_field = 'email' if existing_user.email == data['email'] else 'username' if existing_user.username == data['username'] else 'cpf'
+            print(f"❌ {conflict_field.capitalize()} já cadastrado!")
+            return jsonify({"error": f"{conflict_field.capitalize()} já está em uso!"}), 409
 
-        # 🔒 Hash da senha antes de salvar
+        # 🔒 Hash da senha
         hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
 
-        # ✅ Criar novo usuário
-        new_user = User(username=data['username'], email=data['email'], password_hash=hashed_password)
+        # ✅ Cria usuário com todos os campos
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=hashed_password,
+            phone=data['phone'],  # 👈 Novo campo
+            cpf=data['cpf']      # 👈 Novo campo
+        )
+        
         db.session.add(new_user)
         db.session.commit()
 
