@@ -26,6 +26,9 @@ def create_denuncia():
     titulo = data.get('titulo')
     tipo = data.get('tipo')
     status = data.get('status', 'Pendente')  # Valor padrão para status
+    endereco = data.get('endereco')
+    print(f"Endereço recebido: {endereco}")
+    descricao = data.get('descricao')  # Campo opcional
 
     # Verifique se os campos obrigatórios estão presentes
     if not titulo or not tipo:
@@ -35,7 +38,9 @@ def create_denuncia():
     nova_denuncia = Denuncia(
         titulo=titulo,
         tipo=tipo,
-        status=status
+        status=status,
+        endereco=endereco,
+        descricao=descricao  # Campo opcional
     )
 
     db.session.add(nova_denuncia)

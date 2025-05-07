@@ -23,8 +23,9 @@ class Denuncia(db.Model):
     titulo = db.Column(db.String(255), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(20), nullable=False, default="Pendente")
+    endereco = db.Column(db.String(255), nullable=True)
     descricao = db.Column(db.Text, nullable=True)  # Campo opcional
-
+    
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     def __init__(self, **kwargs):

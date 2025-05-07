@@ -44,7 +44,9 @@ def create_denuncia():
         titulo=data['titulo'],
         tipo=data['tipo'],
         user_id=current_user_id,  # Usa o ID do usuário autenticado
-        status=data.get('status', 'Pendente')
+        status=data.get('status', 'Pendente'),
+        endereco=data.get('endereco'),
+        descricao=data.get('descricao')  # Campo opcional
     )
 
     db.session.add(nova_denuncia)
