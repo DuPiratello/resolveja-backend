@@ -57,6 +57,36 @@ def create_denuncia():
         "id": nova_denuncia.id
     }), 201
 
+@denuncia_routes.route('/minhas-denuncias', methods=['GET'])
+@jwt_required()
+def get_minhas_denuncias():
+    current_user_id = get_jwt_identity()
+    denuncias = Denuncia.query.filter_by(user_id=current_user_id).all()
+    return jsonify([
+        {
+            'id': d.id,
+            'titulo': d.titulo,
+            'tipo': d.tipo,
+            'status': d.status,
+            'descricao': d.descricao
+        } for d in denuncias
+    ])
+
+@denuncia_routes.route('/coordenadas', methods=['GET'])
+def get_coordenadas():
+    denuncias = Denuncia.query.with_entities(Denuncia.endereco).all()
+    coordenadas = []
+
+    for denuncia in denuncias:
+        if denuncia.endereco:  # Verifica se o campo endereco não é nulo
+            try:
+                lat, lng = map(float, denuncia.endereco.split(','))
+                coordenadas.append([lat, lng, 0.5])  # Adiciona intensidade fixa (ex: 0.5)
+            except ValueError:
+                continue  # Ignora entradas inválidas
+
+    return jsonify(coordenadas)
+
 # 📌 **Registrar o blueprint na aplicação**
 def register_routes(app):
     app.register_blueprint(main)

@@ -37,8 +37,8 @@ def register():
             username=data['username'],
             email=data['email'],
             password_hash=hashed_password,
-            phone=data['phone'],  # 👈 Novo campo
-            cpf=data['cpf']      # 👈 Novo campo
+            phone=data['phone'],  
+            cpf=data['cpf']      
         )
         
         db.session.add(new_user)
