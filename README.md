@@ -78,9 +78,6 @@ backend/
 - **OAuth2 / Social Auth**  
   Não há autenticação via provedores externos (Google, Facebook, etc.).
 
-- **Swagger/OpenAPI**  
-  Não há documentação automática de API via Swagger.
-
 - **GraphQL**  
   Não há endpoints GraphQL, apenas REST.
 
