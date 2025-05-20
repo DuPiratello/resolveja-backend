@@ -116,6 +116,15 @@ backend/
 - Migrações gerenciadas via Alembic em [`migrations/`](backend/migrations/)
 - Uso de SQLAlchemy para queries, inserções, atualizações e relacionamentos
 
+```md
+## 🗃️ Migrações de Banco de Dados
+
+Para criar uma nova migração:
+
+```bash
+flask db migrate -m "Mensagem da migração"
+flask db upgrade
+
 ---
 
 ## 🔒 Autenticação e Autorização
@@ -173,9 +182,28 @@ backend/
 
 ---
 
-## 📚 Referências
+## **Exemplo de .env/configuração de variáveis**
 
-- [Flask Documentation](https://flask.palletsprojects.com/)
-- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/)
-- [SQLAlchemy](https://docs.sqlalchemy.org/)
-- [Alembic](https://alembic.sqlalchemy.org/)
+
+## ⚙️ Exemplo de Configuração (.env)
+
+- `DATABASE_URL`: URL de conexão do banco de dados
+- `SECRET_KEY`: Chave secreta Flask
+- `JWT_SECRET_KEY`: Chave secreta para JWT
+- `UPLOAD_FOLDER`: Caminho para uploads de imagens
+
+Exemplo:
+
+```env
+DATABASE_URL=postgresql://user:senha@localhost:5432/resolveja
+SECRET_KEY=sua-chave-secreta
+JWT_SECRET_KEY=sua-chave-jwt
+UPLOAD_FOLDER=backend/uploads
+
+
+## 📑 Documentação Swagger
+
+Acesse a documentação interativa da API em:  
+[http://localhost:5000/apidocs](http://localhost:5000/apidocs)
+
+Para testar rotas protegidas, clique em "Authorize" e insira seu JWT:
