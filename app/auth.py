@@ -150,7 +150,9 @@ def login():
     if not user or not user.check_password(data['password']):
         return jsonify({"error": "Credenciais inválidas"}), 401
 
-    access_token = create_access_token(identity=str(user.id))  # Apenas o ID como string
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"role": user.role})
     return jsonify({"access_token": access_token}), 200
 
 @auth.route('/protected', methods=['GET'])
