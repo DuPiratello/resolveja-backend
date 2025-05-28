@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity  # type:ignore
 from app.decorators import role_required
 from app import db
 from app.models import Denuncia
+from app.models import User  # Certifique-se de importar o modelo de usuário
 
 # Definição do blueprint 'main'
 main = Blueprint('main', __name__)
@@ -86,6 +87,20 @@ def get_coordenadas():
                 continue  # Ignora entradas inválidas
 
     return jsonify(coordenadas)
+
+
+@main.route('/usuarios/<int:id>', methods=['GET'])
+def get_usuario(id):
+    usuario = User.query.get(id)
+    if usuario:
+        return jsonify({
+            "id": usuario.id,
+            "nome": getattr(usuario, "nome", None),
+            "username": getattr(usuario, "username", None),
+            "email": getattr(usuario, "email", None),
+            "role": getattr(usuario, "role", None)
+        })
+    return jsonify({"error": "Usuário não encontrado"}), 404
 
 # 📌 **Registrar o blueprint na aplicação**
 def register_routes(app):
