@@ -8,6 +8,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     cpf = db.Column(db.String(14), unique=True, nullable=False)
+    fotoUrl = db.Column(db.String(255), nullable=True)
     role = db.Column(db.String(20), nullable=False, default="user")
     
     denuncias = db.relationship('Denuncia', backref='user', lazy=True)
