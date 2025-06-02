@@ -20,7 +20,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    CORS(app, origins=["http://localhost:4200"])
+    CORS(app, origins=["http://localhost:4200"], 
+              supports_credentials=True,
+              methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
     socketio.init_app(app)
 
     # ⚠️ Importações de rotas depois da inicialização do db
@@ -33,7 +35,7 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(admin_routes, url_prefix='/admin')  # Rotas admin
     app.register_blueprint(denuncia_routes, url_prefix='/api')  # 📌 Adiciona as rotas de denúncias
-    app.register_blueprint(denuncia_bp, url_prefix='/')  # 📌 Adiciona o blueprint de denúncias
+    
 
     # Configuração detalhada do Swagger
     Swagger(app, template={

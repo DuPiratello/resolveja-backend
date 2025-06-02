@@ -89,6 +89,29 @@ def get_minhas_denuncias():
         } for d in denuncias
     ])
 
+@denuncia_routes.route('/denuncias/<int:id>', methods=['PUT', 'OPTIONS'])
+@jwt_required()
+@role_required('admin')  # Ou remova se quiser permitir para outros perfis
+def update_denuncia(id):
+    denuncia = Denuncia.query.get(id)
+    if not denuncia:
+        return jsonify({'error': 'Denúncia não encontrada'}), 404
+
+    data = request.get_json()
+    if 'status' in data:
+        denuncia.status = data['status']
+    if 'titulo' in data:
+        denuncia.titulo = data['titulo']
+    if 'descricao' in data:
+        denuncia.descricao = data['descricao']
+    if 'tipo' in data:
+        denuncia.tipo = data['tipo']
+    if 'endereco' in data:
+        denuncia.endereco = data['endereco']
+
+    db.session.commit()
+    return jsonify({'message': 'Denúncia atualizada com sucesso!'})
+
 @denuncia_routes.route('/coordenadas', methods=['GET'])
 def get_coordenadas():
     denuncias = Denuncia.query.with_entities(Denuncia.endereco).all()
