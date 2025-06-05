@@ -39,11 +39,19 @@ def admin_panel():
 def get_denuncias():
     denuncias = Denuncia.query.all()
     return jsonify([
-        {'id': d.id,
-         'titulo': d.titulo,
-         'tipo': d.tipo,
-         'status': d.status,
-         'fotoUrl': getattr(d.user, 'fotoUrl', None)}
+        {
+            'id': d.id,
+            'titulo': d.titulo,
+            'tipo': d.tipo,
+            'status': d.status,
+            'descricao': d.descricao,
+            'endereco': d.endereco,
+            'fotoUrl': getattr(d.user, 'fotoUrl', None),
+            'usuario': {
+                'id': d.user.id if d.user else None,
+                'username': d.user.username if d.user else None
+            } if d.user else None
+        }
         for d in denuncias
     ])
 

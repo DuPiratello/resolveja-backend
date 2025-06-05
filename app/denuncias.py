@@ -27,12 +27,22 @@ def get_denuncias():
             $ref: '#/definitions/Denuncia'
     """
     denuncias = Denuncia.query.all()
-    return jsonify([{
-        'id': d.id,
-        'titulo': d.titulo,
-        'tipo': d.tipo,
-        'status': d.status
-    } for d in denuncias])
+    return jsonify([
+        {
+            'id': d.id,
+            'titulo': d.titulo,
+            'tipo': d.tipo,
+            'status': d.status,
+            'endereco': d.endereco,
+            'descricao': d.descricao,
+            'usuario': {
+                'id': d.usuario.id,
+                'nome': d.usuario.nome,
+                'username': d.usuario.username
+            } if d.usuario else None
+        }
+        for d in denuncias
+    ])
 
 @denuncia_bp.route('/denuncias', methods=['POST'])
 @jwt_required()

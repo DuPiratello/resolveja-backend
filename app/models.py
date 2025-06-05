@@ -28,6 +28,7 @@ class Denuncia(db.Model):
     descricao = db.Column(db.Text, nullable=True)  # Campo opcional
     
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.relationship('User', backref='Denuncia')
     
     def __init__(self, **kwargs):
         if not kwargs.get('user_id'):
