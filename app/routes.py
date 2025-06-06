@@ -58,19 +58,37 @@ def get_denuncias():
 @denuncia_routes.route('/denuncias', methods=['POST'])
 @jwt_required()
 def create_denuncia():
-    data = request.get_json()
     current_user_id = get_jwt_identity()
-    
-    if not data or not all(key in data for key in ['titulo', 'tipo']):
+
+    # Recebe campos de texto do form
+    titulo = request.form.get('titulo')
+    tipo = request.form.get('tipo')
+    status = request.form.get('status', 'Pendente')
+    endereco = request.form.get('endereco')
+    descricao = request.form.get('descricao')
+
+    # Recebe o arquivo de imagem
+    foto = request.files.get('foto')
+    foto_url = None
+    if foto and foto.filename != '':
+        if not allowed_file(foto.filename):
+            return jsonify({"error": "Formato de arquivo não permitido"}), 400
+        filename = secure_filename(f"user_{current_user_id}_{foto.filename}")
+        caminho = os.path.join(UPLOAD_FOLDER, filename)
+        foto.save(caminho)
+        foto_url = f'/assets/uploads/{filename}'
+
+    if not titulo or not tipo:
         return jsonify({"error": "Campos 'titulo' e 'tipo' são obrigatórios"}), 400
 
     nova_denuncia = Denuncia(
-        titulo=data['titulo'],
-        tipo=data['tipo'],
+        titulo=titulo,
+        tipo=tipo,
         user_id=current_user_id,
-        status=data.get('status', 'Pendente'),
-        endereco=data.get('endereco'),
-        descricao=data.get('descricao')
+        status=status,
+        endereco=endereco,
+        descricao=descricao,
+        reportFotoUrl=foto_url  # Use o campo correto!
     )
 
     db.session.add(nova_denuncia)

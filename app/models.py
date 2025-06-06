@@ -26,6 +26,7 @@ class Denuncia(db.Model):
     status = db.Column(db.String(20), nullable=False, default="Pendente")
     endereco = db.Column(db.String(255), nullable=True)
     descricao = db.Column(db.Text, nullable=True)  # Campo opcional
+    reportFotoUrl = db.Column(db.String(255), nullable=True)  # Campo para foto da denúncia
     
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     username = db.relationship('User', backref='Denuncia')

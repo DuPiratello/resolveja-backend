@@ -35,6 +35,7 @@ def get_denuncias():
             'status': d.status,
             'endereco': d.endereco,
             'descricao': d.descricao,
+            'reportfotoUrl': d.reportfotoUrl,
             'usuario': {
                 'id': d.usuario.id,
                 'nome': d.usuario.nome,
@@ -107,6 +108,7 @@ def create_denuncia():
     status = data.get('status', 'Pendente')  # Valor padrão para status
     endereco = data.get('endereco')
     descricao = data.get('descricao')  # Campo opcional
+    reportfotoUrl = data.get('reportfotoUrl')  # Campo opcional
 
     if not titulo or not tipo:
         return jsonify({"error": "Campos 'titulo' e 'tipo' são obrigatórios"}), 400
@@ -116,7 +118,8 @@ def create_denuncia():
         tipo=tipo,
         status=status,
         endereco=endereco,
-        descricao=descricao
+        descricao=descricao,
+        reportfotoUrl=reportfotoUrl
     )
 
     db.session.add(nova_denuncia)
@@ -158,7 +161,8 @@ def get_denuncia(id):
         'tipo': denuncia.tipo,
         'status': denuncia.status,
         'endereco': denuncia.endereco,
-        'descricao': denuncia.descricao
+        'descricao': denuncia.descricao,
+        'reportfotoUrl': denuncia.reportfotoUrl
     })
 
 @denuncia_bp.route('/denuncias/<int:id>', methods=['PUT'])
@@ -275,5 +279,7 @@ def minhas_denuncias():
         'tipo': d.tipo,
         'status': d.status,
         'endereco': d.endereco,
-        'descricao': d.descricao
+        'descricao': d.descricao,
+        'reportfotoUrl': d.reportfotoUrl
+        
     } for d in denuncias])
