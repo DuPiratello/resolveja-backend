@@ -6,6 +6,7 @@ from app.models import Denuncia
 from app.models import User
 import os
 from werkzeug.utils import secure_filename # type:ignore
+import uuid
 
 # Definição do blueprint 'main'
 main = Blueprint('main', __name__)
@@ -29,11 +30,6 @@ def home():
 admin_routes = Blueprint('admin_routes', __name__)
 denuncia_routes = Blueprint('denuncia_routes', __name__)
 
-@admin_routes.route('/', methods=['GET'])
-@jwt_required()
-@role_required("admin")
-def admin_panel():
-    return jsonify({"message": "Bem-vindo, Admin!"})
 
 @denuncia_routes.route('/denuncias', methods=['GET'])
 def get_denuncias():
@@ -47,6 +43,7 @@ def get_denuncias():
             'descricao': d.descricao,
             'endereco': d.endereco,
             'fotoUrl': getattr(d.user, 'fotoUrl', None),
+            'reportFotoUrl': d.reportFotoUrl,
             'usuario': {
                 'id': d.user.id if d.user else None,
                 'username': d.user.username if d.user else None
@@ -67,20 +64,10 @@ def create_denuncia():
     endereco = request.form.get('endereco')
     descricao = request.form.get('descricao')
 
-    # Recebe o arquivo de imagem
-    foto = request.files.get('foto')
-    foto_url = None
-    if foto and foto.filename != '':
-        if not allowed_file(foto.filename):
-            return jsonify({"error": "Formato de arquivo não permitido"}), 400
-        filename = secure_filename(f"user_{current_user_id}_{foto.filename}")
-        caminho = os.path.join(UPLOAD_FOLDER, filename)
-        foto.save(caminho)
-        foto_url = f'/assets/uploads/{filename}'
-
     if not titulo or not tipo:
         return jsonify({"error": "Campos 'titulo' e 'tipo' são obrigatórios"}), 400
 
+    # Cria a denúncia sem foto primeiro
     nova_denuncia = Denuncia(
         titulo=titulo,
         tipo=tipo,
@@ -88,11 +75,24 @@ def create_denuncia():
         status=status,
         endereco=endereco,
         descricao=descricao,
-        reportFotoUrl=foto_url  # Use o campo correto!
+        reportFotoUrl=None
     )
-
     db.session.add(nova_denuncia)
     db.session.commit()
+
+    # Agora salva a foto, se houver, usando o id da denúncia + uuid
+    foto = request.files.get('foto')
+    if foto and foto.filename != '':
+        if not allowed_file(foto.filename):
+            return jsonify({"error": "Formato de arquivo não permitido"}), 400
+        ext = foto.filename.rsplit('.', 1)[1].lower()
+        unique_id = uuid.uuid4().hex
+        filename = secure_filename(f"denuncia_{nova_denuncia.id}_{unique_id}.{ext}")
+        caminho = os.path.join(UPLOAD_FOLDER, filename)
+        foto.save(caminho)
+        foto_url = f'/assets/uploads/{filename}'
+        nova_denuncia.reportFotoUrl = foto_url
+        db.session.commit()
 
     return jsonify({
         "message": "Denuncia criada com sucesso!",
