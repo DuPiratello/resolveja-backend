@@ -135,6 +135,32 @@ def get_coordenadas():
 
     return jsonify(coordenadas)
 
+@denuncia_routes.route('/coordenadas-ativas', methods=['GET'])
+def get_coordenadas_ativas():
+    try:
+        # Buscar apenas denúncias que não estão resolvidas nem canceladas
+        denuncias = Denuncia.query.filter(
+            ~Denuncia.status.in_(['Resolvido', 'Cancelado', 'resolvido', 'cancelado'])
+        ).all()
+        
+        coordenadas = []
+        for denuncia in denuncias:
+            if denuncia.endereco:
+                try:
+                    lat, lng = map(float, denuncia.endereco.split(','))
+                    # Formato [latitude, longitude, intensidade]
+                    coordenadas.append([
+                        float(lat),
+                        float(lng), 
+                        1.0  # intensidade padrão
+                    ])
+                except ValueError:
+                    continue
+        
+        return jsonify(coordenadas)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @main.route('/usuarios/<int:id>', methods=['GET'])
 def get_usuario(id):
     usuario = User.query.get(id)
