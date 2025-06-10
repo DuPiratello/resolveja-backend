@@ -7,6 +7,7 @@ from app.models import User
 import os
 from werkzeug.utils import secure_filename # type:ignore
 import uuid
+from sqlalchemy import func  # type:ignore
 
 # Definição do blueprint 'main'
 main = Blueprint('main', __name__)
@@ -178,6 +179,31 @@ def get_coordenadas_ativas():
         return jsonify(coordenadas)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@denuncia_routes.route('/leaderboard', methods=['GET'])
+def leaderboard():
+    from .models import User, Denuncia
+
+    # Consulta: top 5 usuários com mais denúncias resolvidas
+    results = (
+        db.session.query(
+            User.id,
+            User.username,
+            func.count(Denuncia.id).label('resolvidas')
+        )
+        .join(Denuncia, Denuncia.user_id == User.id)
+        .filter(Denuncia.status.ilike('resolvido'))
+        .group_by(User.id, User.username)
+        .order_by(func.count(Denuncia.id).desc())
+        .limit(5)
+        .all()
+    )
+
+    leaderboard = [
+        {"id": r.id, "username": r.username, "resolvidas": r.resolvidas}
+        for r in results
+    ]
+    return jsonify(leaderboard)
 
 @main.route('/usuarios/<int:id>', methods=['GET'])
 def get_usuario(id):
