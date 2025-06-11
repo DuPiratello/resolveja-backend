@@ -11,7 +11,8 @@ from app.decorators import role_required # type: ignore
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
-socketio = SocketIO(cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*", async_mode='eventlet')
+
 
 def create_app():
     app = Flask(__name__)

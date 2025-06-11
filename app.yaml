@@ -1,0 +1,10 @@
+runtime: python310
+
+entrypoint: gunicorn -k eventlet -w 1 run:app
+
+instance_class: F1
+
+env_variables:
+  FLASK_ENV: production
+  # Aqui pode colocar outras variáveis de ambiente que seu app precise, ex:
+  # DATABASE_URL: sua_url_do_banco
