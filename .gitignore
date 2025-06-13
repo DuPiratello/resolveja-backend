@@ -13,3 +13,9 @@ instance/
 
 # Arquivos de migração antigos (se quiser evitar)
 migrations/
+
+chave-gcp.json
+
+deploy.sh
+
+cloud-sql-proxy.exe

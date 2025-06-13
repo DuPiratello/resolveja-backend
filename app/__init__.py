@@ -21,9 +21,11 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    CORS(app, origins=["http://localhost:4200"], 
-              supports_credentials=True,
-              methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    CORS(app, origins=[
+            "http://localhost:4200",
+            "https://resolveja-frontend-3tqrvfefo-projetoaf.vercel.app",
+            "https://resolveja-frontend.vercel.app"
+        ], supports_credentials=True)
     socketio.init_app(app)
 
     # ⚠️ Importações de rotas depois da inicialização do db
