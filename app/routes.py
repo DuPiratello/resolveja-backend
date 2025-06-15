@@ -34,6 +34,38 @@ denuncia_routes = Blueprint('denuncia_routes', __name__)
 
 @denuncia_routes.route('/denuncias', methods=['GET'])
 def get_denuncias():
+    """
+    Cria uma nova denúncia
+    ---
+    tags:
+      - Denúncias
+    consumes:
+      - multipart/form-data
+    parameters:
+      - name: titulo
+        in: formData
+        type: string
+        required: true
+      - name: tipo
+        in: formData
+        type: string
+        required: true
+      - name: status
+        in: formData
+        type: string
+      - name: endereco
+        in: formData
+        type: string
+      - name: descricao
+        in: formData
+        type: string
+      - name: foto
+        in: formData
+        type: file
+    responses:
+      201:
+        description: Denúncia criada com sucesso
+    """
     denuncias = Denuncia.query.all()
     return jsonify([
         {
@@ -56,6 +88,19 @@ def get_denuncias():
 @denuncia_routes.route('/denuncias', methods=['POST'])
 @jwt_required()
 def create_denuncia():
+    """
+    Lista as denúncias do usuário autenticado
+    ---
+    tags:
+      - Denúncias
+    responses:
+      200:
+        description: Lista de denúncias do usuário
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Denuncia'
+    """
     current_user_id = get_jwt_identity()
 
     # Recebe campos de texto do form
@@ -120,6 +165,24 @@ def get_minhas_denuncias():
 @jwt_required()
 @role_required('admin')  # Ou remova se quiser permitir para outros perfis
 def update_denuncia(id):
+    """
+    Atualiza uma denúncia existente
+    ---
+    tags:
+      - Denúncias
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+      - name: body
+        in: body
+        schema:
+          $ref: '#/definitions/Denuncia'
+    responses:
+      200:
+        description: Denúncia atualizada com sucesso
+    """
     denuncia = Denuncia.query.get(id)
     if not denuncia:
         return jsonify({'error': 'Denúncia não encontrada'}), 404
@@ -141,6 +204,21 @@ def update_denuncia(id):
 
 @denuncia_routes.route('/coordenadas', methods=['GET'])
 def get_coordenadas():
+    """
+    Lista coordenadas de todas as denúncias
+    ---
+    tags:
+      - Denúncias
+    responses:
+      200:
+        description: Lista de coordenadas
+        schema:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+    """
     denuncias = Denuncia.query.with_entities(Denuncia.endereco).all()
     coordenadas = []
 
@@ -156,6 +234,21 @@ def get_coordenadas():
 
 @denuncia_routes.route('/coordenadas-ativas', methods=['GET'])
 def get_coordenadas_ativas():
+    """
+    Lista coordenadas de denúncias ativas (não resolvidas/canceladas)
+    ---
+    tags:
+      - Denúncias
+    responses:
+      200:
+        description: Lista de coordenadas ativas
+        schema:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+    """
     try:
         # Buscar apenas denúncias que não estão resolvidas nem canceladas
         denuncias = Denuncia.query.filter(
@@ -182,6 +275,26 @@ def get_coordenadas_ativas():
 
 @denuncia_routes.route('/leaderboard', methods=['GET'])
 def leaderboard():
+    """
+    Retorna o ranking dos usuários com mais denúncias resolvidas
+    ---
+    tags:
+      - Denúncias
+    responses:
+      200:
+        description: Ranking de usuários
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              username:
+                type: string
+              resolvidas:
+                type: integer
+    """
     from .models import User, Denuncia
 
     # Consulta: top 5 usuários com mais denúncias resolvidas
@@ -207,6 +320,37 @@ def leaderboard():
 
 @main.route('/usuarios/<int:id>', methods=['GET'])
 def get_usuario(id):
+    """
+    Retorna os dados de um usuário pelo ID
+    ---
+    tags:
+      - Usuários
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Dados do usuário
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            email:
+              type: string
+            role:
+              type: string
+            telefone:
+              type: string
+            fotoUrl:
+              type: string
+      404:
+        description: Usuário não encontrado
+    """
     usuario = User.query.get(id)
     if usuario:
         return jsonify({
@@ -222,6 +366,30 @@ def get_usuario(id):
 @main.route('/usuarios/<int:id>', methods=['PUT'])
 @jwt_required()
 def atualizar_usuario(id):
+    """
+    Atualiza dados do usuário (telefone e foto)
+    ---
+    tags:
+      - Usuários
+    consumes:
+      - multipart/form-data
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+      - name: telefone
+        in: formData
+        type: string
+      - name: foto
+        in: formData
+        type: file
+    responses:
+      200:
+        description: Usuário atualizado
+      404:
+        description: Usuário não encontrado
+    """
     usuario = User.query.get(id)  # Corrigido: User em vez de usuario
     if not usuario:
         return jsonify({'error': 'Usuário não encontrado'}), 404
